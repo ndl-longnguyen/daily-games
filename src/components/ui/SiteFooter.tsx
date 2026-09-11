@@ -7,7 +7,6 @@ import {
   Globe,
   Shield,
   ExternalLink,
-  Heart,
   Sparkles,
   Lock,
   Mail,
@@ -275,12 +274,10 @@ export default function SiteFooter() {
         </div>
 
         {/* Bottom Bar: Copyright & Attribution */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-[11px] text-slate-400 pt-2 text-center sm:text-left">
           <p>© {currentYear} Daily Games. All rights reserved.</p>
-          <div className="flex items-center gap-1.5 text-slate-400">
-            <span>Part of the NDL network. Designed &amp; built with</span>
-            <Heart className="w-3 h-3 text-rose-500 fill-rose-500" />
-            <span>by</span>
+          <p className="whitespace-nowrap">
+            Part of the NDL network. Designed &amp; built by{' '}
             <a
               href={MAIN_SITE_URL}
               target="_blank"
@@ -289,7 +286,7 @@ export default function SiteFooter() {
             >
               Nguyen Dai Long (NDL)
             </a>
-          </div>
+          </p>
         </div>
       </div>
     </footer>
