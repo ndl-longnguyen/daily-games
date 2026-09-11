@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     const dateSeed = body.dateSeed || getTodaySeedString();
     const gameType: GameType = body.gameType || 'emoji';
 
-    const session = createGameSession(dateSeed, gameType);
+    const session = await createGameSession(dateSeed, gameType);
 
     return NextResponse.json({
       success: true,

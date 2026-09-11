@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     const effectiveDateSeed = dateSeed || getTodaySeedString();
 
-    const result = finishGameSession({
+    const result = await finishGameSession({
       sessionId,
       gameType,
       nickname: nickname || 'Player',
