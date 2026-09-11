@@ -48,26 +48,26 @@ export default function Header() {
   const pad = (n: number) => String(n).padStart(2, '0');
 
   return (
-    <header className="w-full glass-panel border-b border-white/10 px-3 py-2 sm:px-6 sm:py-2.5 sticky top-0 z-40 transition-all">
-      <div className="max-w-xl mx-auto flex flex-col gap-2">
+    <header className="w-full glass-panel border-b border-white/10 px-2.5 sm:px-6 py-2 sm:py-2.5 pt-safe sticky top-0 z-40 transition-all select-none">
+      <div className="max-w-xl mx-auto flex flex-col gap-1.5 sm:gap-2">
         {/* Top bar: Brand + View Switcher + Status & Sound */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Brand */}
-          <div className="flex items-center gap-2">
-            <span className="text-xl">⚡</span>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm sm:text-base text-white tracking-tight">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="text-lg sm:text-xl shrink-0">⚡</span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="font-bold text-xs sm:text-base text-white tracking-tight truncate">
                 Daily Games
               </span>
               {/* Online/Offline Badge */}
               {isMounted && (
                 <span
                   title={isOnline ? 'Online & Synchronized' : 'Offline Mode (PWA Ready)'}
-                  className={`flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
+                  className={'flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded border shrink-0 ' + (
                     isOnline
                       ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                       : 'bg-amber-500/15 text-amber-300 border-amber-500/30 animate-pulse'
-                  }`}
+                  )}
                 >
                   {isOnline ? <Wifi className="w-2.5 h-2.5" /> : <WifiOff className="w-2.5 h-2.5" />}
                   <span>{isOnline ? 'PWA' : 'Offline'}</span>
@@ -77,37 +77,37 @@ export default function Header() {
           </div>
 
           {/* Tab switch (Play vs Leaderboard) */}
-          <div className="flex items-center bg-slate-800/80 p-0.5 rounded-xl border border-slate-700/60">
+          <div className="flex items-center bg-slate-800/80 p-0.5 rounded-xl border border-slate-700/60 shrink-0">
             <button
               onClick={() => setActiveTab('game')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+              className={'flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium transition-all touch-manipulation ' + (
                 activeTab === 'game'
                   ? 'bg-slate-200 text-slate-900 font-bold shadow-sm'
                   : 'text-slate-400 hover:text-white'
-              }`}
+              )}
             >
-              <Grid className="w-3.5 h-3.5" />
+              <Grid className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span>Play</span>
             </button>
             <button
               onClick={() => setActiveTab('leaderboard')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+              className={'flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium transition-all touch-manipulation ' + (
                 activeTab === 'leaderboard'
                   ? 'bg-slate-200 text-slate-900 font-bold shadow-sm'
                   : 'text-slate-400 hover:text-white'
-              }`}
+              )}
             >
-              <Trophy className="w-3.5 h-3.5" />
+              <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span>Ranks</span>
             </button>
           </div>
 
           {/* Right: Daily Countdown & Sound */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 shrink-0">
             {isMounted && (
               <div
                 title="Time remaining until daily puzzles reset"
-                className="hidden sm:flex items-center gap-1 text-[11px] text-slate-400 font-mono bg-slate-900/60 px-2 py-1 rounded-lg border border-slate-800"
+                className="hidden md:flex items-center gap-1 text-[11px] text-slate-400 font-mono bg-slate-900/60 px-2 py-1 rounded-lg border border-slate-800"
               >
                 <Clock className="w-3 h-3 text-amber-400" />
                 <span>
@@ -120,7 +120,7 @@ export default function Header() {
               onClick={toggleSound}
               aria-label={soundMuted ? 'Unmute audio' : 'Mute audio'}
               title={soundMuted ? 'Unmute audio' : 'Mute audio'}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 active:scale-95 transition-all touch-manipulation flex items-center justify-center"
             >
               {soundMuted ? (
                 <VolumeX className="w-4 h-4 text-slate-500" />
@@ -132,7 +132,7 @@ export default function Header() {
         </div>
 
         {/* Game Switcher Pills */}
-        <div className="grid grid-cols-3 gap-1.5 bg-slate-900/60 p-1 rounded-xl border border-slate-800">
+        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 bg-slate-900/60 p-1 rounded-xl border border-slate-800">
           {GAMES_LIST.map((game) => {
             const isActive = activeGame === game.id;
             return (
@@ -142,13 +142,13 @@ export default function Header() {
                   setActiveGame(game.id);
                   if (activeTab !== 'game') setActiveTab('game');
                 }}
-                className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all touch-manipulation ${
+                className={'flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 px-1.5 sm:px-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-all touch-manipulation active:scale-95 ' + (
                   isActive
                     ? 'bg-slate-800 text-white border border-slate-600 shadow-sm'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-                }`}
+                )}
               >
-                <span>{game.icon}</span>
+                <span className="shrink-0 text-xs sm:text-sm">{game.icon}</span>
                 <span className="truncate">{game.shortName}</span>
               </button>
             );

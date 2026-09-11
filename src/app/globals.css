@@ -8,6 +8,12 @@
   --card-accent: #6366f1;
 }
 
+html {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  color-scheme: dark;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -19,6 +25,7 @@ body {
     radial-gradient(ellipse at top, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
     radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.08) 0%, transparent 60%);
   background-attachment: fixed;
+  min-height: 100dvh;
 }
 
 /* Custom 3D Card Flip Styles */
@@ -77,4 +84,13 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* iOS Safe Areas */
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }

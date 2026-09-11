@@ -48,7 +48,7 @@ export default function SudokuBoard() {
     selectedR >= 0 && selectedC >= 0 ? grid[selectedR][selectedC].value : 0;
 
   return (
-    <div className="w-full max-w-[460px] mx-auto p-2 sm:p-3 glass-panel rounded-2xl border border-white/10 shadow-2xl">
+    <div className="w-full max-w-[460px] mx-auto p-1.5 sm:p-3 glass-panel rounded-2xl border border-white/10 shadow-2xl select-none">
       <div className="grid grid-cols-9 bg-slate-900 border-2 border-slate-600 rounded-xl overflow-hidden shadow-inner">
         {grid.map((row, rIdx) =>
           row.map((cell, cIdx) => {
@@ -63,9 +63,9 @@ export default function SudokuBoard() {
 
             // Border styling for 3x3 blocks
             const borderRight =
-              cIdx % 3 === 2 && cIdx !== 8 ? 'border-r-2 border-r-slate-600' : 'border-r border-r-slate-800';
+              cIdx % 3 === 2 && cIdx !== 8 ? 'border-r-2 border-r-slate-500' : 'border-r border-r-slate-800';
             const borderBottom =
-              rIdx % 3 === 2 && rIdx !== 8 ? 'border-b-2 border-b-slate-600' : 'border-b border-b-slate-800';
+              rIdx % 3 === 2 && rIdx !== 8 ? 'border-b-2 border-b-slate-500' : 'border-b border-b-slate-800';
 
             let bgClass = 'bg-slate-900';
             if (isSelected) {
@@ -78,25 +78,25 @@ export default function SudokuBoard() {
 
             return (
               <div
-                key={`${rIdx}-${cIdx}`}
+                key={rIdx + '-' + cIdx}
                 onClick={() => selectCell(rIdx, cIdx)}
-                className={`w-full aspect-square flex items-center justify-center cursor-pointer select-none transition-colors touch-manipulation ${bgClass} ${borderRight} ${borderBottom}`}
+                className={'w-full aspect-square flex items-center justify-center cursor-pointer select-none transition-colors touch-manipulation ' + bgClass + ' ' + borderRight + ' ' + borderBottom}
               >
                 {cell.value > 0 ? (
                   <span
-                    className={`text-base sm:text-xl font-mono font-bold leading-none ${
+                    className={'text-sm sm:text-lg md:text-xl font-mono font-bold leading-none ' + (
                       cell.isError
                         ? 'text-rose-400'
                         : cell.isGiven
                         ? 'text-white'
                         : 'text-indigo-300'
-                    }`}
+                    )}
                   >
                     {cell.value}
                   </span>
                 ) : cell.notes.length > 0 ? (
                   // 3x3 Mini Notes Matrix
-                  <div className="grid grid-cols-3 gap-0 w-full h-full p-0.5 text-[8px] sm:text-[9px] font-mono leading-none text-slate-400 text-center items-center">
+                  <div className="grid grid-cols-3 gap-0 w-full h-full p-0.5 text-[7px] sm:text-[9px] font-mono leading-none text-slate-400 text-center items-center">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
                       <span key={n} className="flex items-center justify-center">
                         {cell.notes.includes(n) ? n : ''}

@@ -62,7 +62,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-start max-w-4xl mx-auto w-full px-2 sm:px-4 pt-2 sm:pt-4">
+    <div className="flex-1 flex flex-col items-center justify-start max-w-4xl mx-auto w-full px-2 sm:px-4 pt-1.5 sm:pt-3 pb-safe">
       {/* Semantic H1 for Search Engines */}
       <h1 className="sr-only">
         Daily Games – Free Daily Brain Puzzles & Retro Arcade: Emoji Match 8x8, Sudoku 9x9, Tetris Sprint
