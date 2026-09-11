@@ -22,7 +22,6 @@ import TouchControls from '@/components/games/tetris/TouchControls';
 // Unified Result & Leaderboard
 import GameResultModal from '@/components/game/GameResultModal';
 import LeaderboardSection from '@/components/ui/LeaderboardSection';
-import SiteFooter from '@/components/ui/SiteFooter';
 
 import { Sparkles, Trophy, HelpCircle, ChevronDown, Keyboard, Smartphone, Wifi, Zap, ShieldCheck } from 'lucide-react';
 import { initOfflineSync } from '@/lib/sync';
@@ -311,7 +310,6 @@ export default function HomePage() {
       </article>
 
       {/* Standard NDL Ecosystem Footer */}
-      <SiteFooter />
-    </div>
+          </div>
   );
 }

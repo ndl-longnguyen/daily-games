@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Header from '@/components/ui/Header';
+import SiteFooter from '@/components/ui/SiteFooter';
 import Script from 'next/script';
 import { SITE_URL, SITE_CONFIG } from '@/lib/config/site';
 
@@ -62,6 +63,20 @@ export const metadata: Metadata = {
     title: 'Daily Games – Free Daily Brain Puzzles & Retro Arcade',
     description:
       'Challenge your brain with 3 daily puzzle games: Emoji Match 8x8, Sudoku 9x9, and Tetris Sprint. Play offline anywhere, compete on the global leaderboard!',
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
   },
   manifest: '/manifest.webmanifest',
 };
@@ -174,7 +189,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Daily Games" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -190,6 +207,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col antialiased text-slate-100 selection:bg-indigo-500 selection:text-white bg-[#090d16]">
         <Header />
         <main className="flex-1 flex flex-col">{children}</main>
+        <SiteFooter />
 
         {/* PWA Service Worker Registration */}
         <Script id="register-sw" strategy="afterInteractive">

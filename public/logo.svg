@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 96" width="440" height="96">
+  <defs>
+    <!-- Emblem Re-use -->
+    <radialGradient id="logoBg" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#090D16" />
+    </radialGradient>
+
+    <linearGradient id="logoBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+
+    <linearGradient id="logoBolt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#F1F5F9" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Icon Emblem (76x76) -->
+  <g transform="translate(8, 10)">
+    <rect x="0" y="0" width="76" height="76" rx="20" fill="url(#logoBg)" stroke="url(#logoBorder)" stroke-width="3" />
+    <rect x="4" y="4" width="68" height="68" rx="16" fill="none" stroke="#6366F1" stroke-width="1" stroke-dasharray="3,4" opacity="0.5" />
+    
+    <!-- Mini Puzzle Tiles -->
+    <rect x="14" y="14" width="21" height="21" rx="4" fill="#4F46E5" opacity="0.8" />
+    <rect x="41" y="14" width="21" height="21" rx="4" fill="#06B6D4" opacity="0.8" />
+    <rect x="14" y="41" width="21" height="21" rx="4" fill="#F43F5E" opacity="0.8" />
+    <rect x="41" y="41" width="21" height="21" rx="4" fill="#10B981" opacity="0.8" />
+
+    <!-- Mini Bolt -->
+    <path
+      d="M 44 11 L 27 41 L 39 41 L 33 65 L 51 35 L 39 35 Z"
+      fill="url(#logoBolt)"
+      stroke="#FFFFFF"
+      stroke-width="1.5"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Typography Right -->
+  <g transform="translate(98, 18)">
+    <!-- Brand Title -->
+    <text x="0" y="32" fill="url(#textGrad)" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="900" letter-spacing="-0.5">
+      Daily Games
+    </text>
+
+    <!-- NDL Subtitle & Ecosystem Tag -->
+    <text x="2" y="52" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" letter-spacing="2.8">
+      BRAIN PUZZLES &amp; RETRO ARCADE
+    </text>
+  </g>
+
+  <!-- NDL Mini Badge on Far Right -->
+  <g transform="translate(378, 22)">
+    <rect x="0" y="0" width="48" height="20" rx="6" fill="url(#badgeGrad)" opacity="0.2" stroke="#818CF8" stroke-width="1" />
+    <text x="24" y="14" fill="#C7D2FE" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="800" text-anchor="middle" letter-spacing="1">
+      NDL
+    </text>
+  </g>
+</svg>

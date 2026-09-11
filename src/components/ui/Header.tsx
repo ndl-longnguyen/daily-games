@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import Image from 'next/image';
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { Volume2, VolumeX, Clock, Trophy, Grid, Wifi, WifiOff } from 'lucide-react';
 import { useGameStore } from '@/store/useGameStore';
@@ -53,10 +55,17 @@ export default function Header() {
         {/* Top bar: Brand + View Switcher + Status & Sound */}
         <div className="flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Brand */}
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <span className="text-lg sm:text-xl shrink-0">⚡</span>
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 min-w-0 group">
+            <Image
+              src="/logo-icon.svg"
+              alt="Daily Games Logo"
+              width={32}
+              height={32}
+              priority
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl shadow-md border border-indigo-500/40 group-hover:border-indigo-400 shrink-0 transition-colors"
+            />
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="font-bold text-xs sm:text-base text-white tracking-tight truncate">
+              <span className="font-bold text-xs sm:text-base text-white tracking-tight truncate group-hover:text-indigo-200 transition-colors">
                 Daily Games
               </span>
               {/* Online/Offline Badge */}
@@ -74,7 +83,7 @@ export default function Header() {
                 </span>
               )}
             </div>
-          </div>
+          </Link>
 
           {/* Tab switch (Play vs Leaderboard) */}
           <div className="flex items-center bg-slate-800/80 p-0.5 rounded-xl border border-slate-700/60 shrink-0">
