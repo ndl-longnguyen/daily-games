@@ -68,19 +68,25 @@ export default function Header() {
               <span className="font-bold text-xs sm:text-base text-white tracking-tight truncate group-hover:text-indigo-200 transition-colors">
                 Daily Games
               </span>
-              {/* Online/Offline Badge */}
+              {/* Online/Offline Badge & Install Trigger */}
               {isMounted && (
-                <span
-                  title={isOnline ? 'Online & Synchronized' : 'Offline Mode (PWA Ready)'}
-                  className={'flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded border shrink-0 ' + (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.dispatchEvent(new CustomEvent('open-pwa-install-guide'));
+                  }}
+                  title={isOnline ? 'Online & Synchronized • Click to Install PWA' : 'Offline Mode • Click for Install Guide'}
+                  className={'flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded border shrink-0 transition-all hover:scale-105 active:scale-95 cursor-pointer ' + (
                     isOnline
-                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25'
                       : 'bg-amber-500/15 text-amber-300 border-amber-500/30 animate-pulse'
                   )}
                 >
                   {isOnline ? <Wifi className="w-2.5 h-2.5" /> : <WifiOff className="w-2.5 h-2.5" />}
                   <span>{isOnline ? 'PWA' : 'Offline'}</span>
-                </span>
+                </button>
               )}
             </div>
           </Link>

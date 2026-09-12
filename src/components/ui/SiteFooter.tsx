@@ -123,6 +123,16 @@ export default function SiteFooter() {
                   <span>How to Play &amp; Keyboard Controls</span>
                 </Link>
               </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-pwa-install-guide'))}
+                  className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-medium text-left cursor-pointer"
+                >
+                  <span>📲</span>
+                  <span>Install App (Play Offline)</span>
+                </button>
+              </li>
             </ul>
           </div>
 

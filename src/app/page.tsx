@@ -23,7 +23,7 @@ import TouchControls from '@/components/games/tetris/TouchControls';
 import GameResultModal from '@/components/game/GameResultModal';
 import LeaderboardSection from '@/components/ui/LeaderboardSection';
 
-import { Sparkles, Trophy, HelpCircle, ChevronDown, Keyboard, Smartphone, Wifi, Zap, ShieldCheck } from 'lucide-react';
+import { Sparkles, Trophy, HelpCircle, ChevronDown, Keyboard, Smartphone, Wifi, Zap, ShieldCheck, Download } from 'lucide-react';
 import { initOfflineSync } from '@/lib/sync';
 
 export default function HomePage() {
@@ -207,14 +207,24 @@ export default function HomePage() {
 
         {/* Features & PWA Offline Sync */}
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="glass-panel rounded-3xl p-5 border border-white/10 flex flex-col gap-2">
-            <h3 className="font-bold text-white text-sm flex items-center gap-2">
-              <Wifi className="w-4 h-4 text-emerald-400" />
-              <span>100% Offline PWA Playability</span>
-            </h3>
-            <p className="text-slate-400 leading-relaxed text-[11px]">
-              Install Daily Games to your home screen on iOS, Android, or Desktop. All board generators and game engines run locally in your browser without needing an internet connection.
-            </p>
+          <div className="glass-panel rounded-3xl p-5 border border-white/10 flex flex-col gap-2 justify-between">
+            <div className="flex flex-col gap-2">
+              <h3 className="font-bold text-white text-sm flex items-center gap-2">
+                <Wifi className="w-4 h-4 text-emerald-400" />
+                <span>100% Offline PWA Playability</span>
+              </h3>
+              <p className="text-slate-400 leading-relaxed text-[11px]">
+                Install Daily Games to your home screen on iOS, Android, or Desktop. All board generators and game engines run locally in your browser without needing an internet connection.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-pwa-install-guide'))}
+              className="mt-2 self-start flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold transition-all active:scale-95 cursor-pointer touch-manipulation"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Install App &amp; Offline Guide</span>
+            </button>
           </div>
 
           <div className="glass-panel rounded-3xl p-5 border border-white/10 flex flex-col gap-2">

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Header from '@/components/ui/Header';
 import SiteFooter from '@/components/ui/SiteFooter';
+import { PwaInstallPrompt } from '@/components/common/PwaInstallPrompt';
 import Script from 'next/script';
 import { SITE_URL, SITE_CONFIG } from '@/lib/config/site';
 
@@ -208,6 +209,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1 flex flex-col">{children}</main>
         <SiteFooter />
+        <PwaInstallPrompt />
 
         {/* PWA Service Worker Registration */}
         <Script id="register-sw" strategy="afterInteractive">
