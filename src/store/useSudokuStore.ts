@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { SudokuGrid } from '@/lib/games/sudoku/types';
 import { generateDailySudoku, isSudokuSolved } from '@/lib/games/sudoku/generator';
 import { getTodaySeedString } from '@/lib/prng';
-import { queueOfflineScore, getStoredSetting } from '@/lib/storage';
+import { queueOfflineScore, getStoredSetting, setStoredSetting } from '@/lib/storage';
 import { sound } from '@/lib/audio';
 import { SUDOKU_MAX_MISTAKES } from '@/lib/constants';
 
@@ -19,11 +19,13 @@ interface SudokuState {
   isTimerRunning: boolean;
   startTime: number | null;
   sessionId: string | null;
+  nickname: string;
   serverRank: number | null;
   isSubmitting: boolean;
 
   // Actions
   initSudoku: (forceDateSeed?: string) => Promise<void>;
+  setNickname: (name: string) => void;
   selectCell: (row: number, col: number) => void;
   inputNumber: (digit: number) => void;
   eraseCell: () => void;
@@ -48,11 +50,13 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
   isTimerRunning: false,
   startTime: null,
   sessionId: null,
+  nickname: 'Player',
   serverRank: null,
   isSubmitting: false,
 
   initSudoku: async (forceDateSeed) => {
     const today = forceDateSeed || getTodaySeedString();
+    const storedNickname = await getStoredSetting<string>('player_nickname', 'Player');
     const { grid } = generateDailySudoku(today);
 
     let sessId: string | null = null;
@@ -85,9 +89,16 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
       isTimerRunning: false,
       startTime: null,
       sessionId: sessId,
+      nickname: storedNickname,
       serverRank: null,
       isSubmitting: false,
     });
+  },
+
+  setNickname: (name: string) => {
+    const trimmed = name.trim().slice(0, 24) || 'Player';
+    set({ nickname: trimmed });
+    setStoredSetting('player_nickname', trimmed);
   },
 
   selectCell: (row: number, col: number) => {
@@ -211,7 +222,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
     if (!state.isCompleted) return;
 
     const effSessionId = state.sessionId || ('offline-' + crypto.randomUUID());
-    const storedNickname = (await getStoredSetting<string>('player_nickname', 'Player')) || 'Player';
+    const effNickname = state.nickname || (await getStoredSetting<string>('player_nickname', 'Player')) || 'Player';
     set({ sessionId: effSessionId, isSubmitting: true });
 
     if (typeof window !== 'undefined' && !navigator.onLine) {
@@ -219,7 +230,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
         id: effSessionId,
         gameType: 'sudoku',
         dateSeed: state.dateSeed,
-        nickname: storedNickname,
+        nickname: effNickname,
         movesCount: Math.max(20, state.movesCount),
         score: 0,
         durationMs: state.elapsedMs,
@@ -236,7 +247,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
         body: JSON.stringify({
           sessionId: effSessionId,
           gameType: 'sudoku',
-          nickname: storedNickname,
+          nickname: effNickname,
           movesCount: Math.max(20, state.movesCount),
           dateSeed: state.dateSeed,
           durationMs: state.elapsedMs,
@@ -246,12 +257,15 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
       const data = await res.json();
       if (data.success) {
         set({ serverRank: data.rank, isSubmitting: false });
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('scores-synced', { detail: { count: 1 } }));
+        }
       } else {
         await queueOfflineScore({
           id: effSessionId,
           gameType: 'sudoku',
           dateSeed: state.dateSeed,
-          nickname: storedNickname,
+          nickname: effNickname,
           movesCount: Math.max(20, state.movesCount),
           score: 0,
           durationMs: state.elapsedMs,
@@ -264,7 +278,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
         id: effSessionId,
         gameType: 'sudoku',
         dateSeed: state.dateSeed,
-        nickname: storedNickname,
+        nickname: effNickname,
         movesCount: Math.max(20, state.movesCount),
         score: 0,
         durationMs: state.elapsedMs,

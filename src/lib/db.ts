@@ -14,6 +14,7 @@ export interface LeaderboardEntry {
   createdAt: number;
   dateSeed: string;
   gameType: GameType;
+  sessionId?: string;
 }
 
 // Session secret for HMAC stateless verification
@@ -186,19 +187,22 @@ export async function finishGameSession(params: {
     const supabase = getSupabase();
     if (supabase) {
       try {
-        const { error: insertError } = await supabase.from('leaderboard').insert({
-          session_id: sessionId,
-          game_type: gameType,
-          date_seed: dateSeed,
-          nickname: cleanNickname,
-          duration_ms: finalDurationMs,
-          moves_count: movesCount,
-          score: score,
-          created_at: now,
-        });
+        const { error: upsertError } = await supabase.from('leaderboard').upsert(
+          {
+            session_id: sessionId,
+            game_type: gameType,
+            date_seed: dateSeed,
+            nickname: cleanNickname,
+            duration_ms: finalDurationMs,
+            moves_count: movesCount,
+            score: score,
+            created_at: now,
+          },
+          { onConflict: 'session_id' }
+        );
 
-        if (insertError) {
-          console.warn('[DB] Supabase insert notice:', insertError.message);
+        if (upsertError) {
+          console.warn('[DB] Supabase upsert notice:', upsertError.message);
         }
 
         // Calculate rank in Supabase
@@ -242,9 +246,22 @@ export async function finishGameSession(params: {
       createdAt: now,
       dateSeed: dateSeed,
       gameType: gameType,
+      sessionId: sessionId,
     };
 
-    entries.push(newEntry);
+    const existingIdx = entries.findIndex(
+      (e) => (e.sessionId && e.sessionId === sessionId) || (e.dateSeed === dateSeed && e.gameType === gameType && e.durationMs === finalDurationMs && e.movesCount === movesCount)
+    );
+
+    if (existingIdx >= 0) {
+      entries[existingIdx] = {
+        ...entries[existingIdx],
+        nickname: cleanNickname,
+        createdAt: now,
+      };
+    } else {
+      entries.push(newEntry);
+    }
 
     // Calculate rank in fallback store
     const todayEntries = entries.filter(

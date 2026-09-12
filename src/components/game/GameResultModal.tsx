@@ -31,6 +31,9 @@ export default function GameResultModal() {
   const sudokuElapsed = useSudokuStore((state) => state.elapsedMs);
   const sudokuMistakes = useSudokuStore((state) => state.mistakesCount);
   const sudokuRank = useSudokuStore((state) => state.serverRank);
+  const sudokuNickname = useSudokuStore((state) => state.nickname);
+  const setSudokuNickname = useSudokuStore((state) => state.setNickname);
+  const isSudokuSubmitting = useSudokuStore((state) => state.isSubmitting);
   const resetSudoku = useSudokuStore((state) => state.resetSudoku);
   const submitSudokuScore = useSudokuStore((state) => state.submitFinalScore);
 
@@ -41,11 +44,24 @@ export default function GameResultModal() {
   const tetrisScore = useTetrisStore((state) => state.score);
   const tetrisLines = useTetrisStore((state) => state.linesCleared);
   const tetrisRank = useTetrisStore((state) => state.serverRank);
+  const tetrisNickname = useTetrisStore((state) => state.nickname);
+  const setTetrisNickname = useTetrisStore((state) => state.setNickname);
+  const isTetrisSubmitting = useTetrisStore((state) => state.isSubmitting);
   const resetTetris = useTetrisStore((state) => state.resetTetris);
   const submitTetrisScore = useTetrisStore((state) => state.submitFinalScore);
 
+  const activeNickname =
+    activeGame === 'tetris'
+      ? tetrisNickname
+      : activeGame === 'sudoku'
+      ? sudokuNickname
+      : emojiNickname;
+
+  const isSubmitting = isEmojiSubmitting || isSudokuSubmitting || isTetrisSubmitting;
+
   const [copied, setCopied] = useState(false);
-  const [inputName, setInputName] = useState(emojiNickname || 'Player');
+  const [customName, setCustomName] = useState<string | null>(null);
+  const inputName = customName !== null ? customName : (activeNickname || 'Player');
 
   // Determine modal active state
   let isOpen = false;
@@ -98,6 +114,8 @@ export default function GameResultModal() {
     }
   }, [isOpen, isVictory]);
 
+
+
   if (!isOpen) return null;
 
   const totalSecs = Math.floor(elapsedMs / 1000);
@@ -143,7 +161,11 @@ export default function GameResultModal() {
 
   const handleSaveNickname = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEmojiNickname(inputName);
+    const clean = inputName.trim().slice(0, 24) || 'Player';
+    setEmojiNickname(clean);
+    setSudokuNickname(clean);
+    setTetrisNickname(clean);
+    setCustomName(clean);
     await handleSubmit();
   };
 
@@ -215,18 +237,18 @@ export default function GameResultModal() {
               <input
                 type="text"
                 value={inputName}
-                onChange={(e) => setInputName(e.target.value)}
+                onChange={(e) => setCustomName(e.target.value)}
                 maxLength={20}
                 placeholder="Your nickname..."
                 className="flex-1 bg-slate-900 px-3 py-1.5 rounded-xl text-xs text-white border border-slate-700 focus:outline-none focus:border-indigo-500"
               />
               <button
                 type="submit"
-                disabled={isEmojiSubmitting || !inputName.trim()}
+                disabled={isSubmitting || !inputName.trim()}
                 className="px-3.5 py-1.5 rounded-xl bg-slate-200 hover:bg-white text-slate-900 font-bold text-xs transition-colors flex items-center gap-1 shadow-sm touch-manipulation"
               >
                 <UserCheck className="w-3.5 h-3.5" />
-                <span>{isEmojiSubmitting ? '...' : 'Save'}</span>
+                <span>{isSubmitting ? '...' : 'Save'}</span>
               </button>
             </form>
 
@@ -261,7 +283,7 @@ export default function GameResultModal() {
           </button>
 
           <button
-            onClick={handleReset}
+            onClick={() => { setCustomName(null); handleReset(); }}
             className="w-full py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold text-xs border border-slate-700 transition-colors flex items-center justify-center gap-1.5 touch-manipulation"
           >
             <RefreshCw className="w-3.5 h-3.5" />

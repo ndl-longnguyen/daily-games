@@ -11,7 +11,7 @@ import {
 import { TetrominoType } from '@/lib/games/tetris/tetrominoes';
 import { TETRIS_COLS } from '@/lib/constants';
 import { getTodaySeedString } from '@/lib/prng';
-import { queueOfflineScore, getStoredSetting } from '@/lib/storage';
+import { queueOfflineScore, getStoredSetting, setStoredSetting } from '@/lib/storage';
 import { sound } from '@/lib/audio';
 
 interface TetrisState {
@@ -90,6 +90,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
 
   initTetris: async (forceDateSeed) => {
     const today = forceDateSeed || getTodaySeedString();
+    const storedNickname = await getStoredSetting<string>('player_nickname', 'Player');
     getNextBagPiece = createSeededBag(today);
 
     // Populate initial queue
@@ -138,6 +139,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
       linesCleared: 0,
       level: 1,
       score: 0,
+      nickname: storedNickname,
       isGameOver: false,
       isCompleted: false,
       isPaused: false,
@@ -434,13 +436,15 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
   },
 
   setNickname: (name: string) => {
-    set({ nickname: name.trim().slice(0, 24) || 'Player' });
+    const trimmed = name.trim().slice(0, 24) || 'Player';
+    set({ nickname: trimmed });
+    setStoredSetting('player_nickname', trimmed);
   },
 
   submitFinalScore: async () => {
     const state = get();
     const effSessionId = state.sessionId || ('offline-' + crypto.randomUUID());
-    const storedNickname = (await getStoredSetting<string>('player_nickname', state.nickname)) || 'Player';
+    const effNickname = state.nickname || (await getStoredSetting<string>('player_nickname', 'Player')) || 'Player';
     set({ sessionId: effSessionId, isSubmitting: true });
 
     if (typeof window !== 'undefined' && !navigator.onLine) {
@@ -448,7 +452,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
         id: effSessionId,
         gameType: 'tetris',
         dateSeed: state.dateSeed,
-        nickname: storedNickname,
+        nickname: effNickname,
         movesCount: state.linesCleared,
         score: state.score,
         durationMs: state.elapsedMs,
@@ -465,7 +469,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
         body: JSON.stringify({
           sessionId: effSessionId,
           gameType: 'tetris',
-          nickname: storedNickname,
+          nickname: effNickname,
           movesCount: state.linesCleared,
           score: state.score,
           dateSeed: state.dateSeed,
@@ -476,12 +480,15 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
       const data = await res.json();
       if (data.success) {
         set({ serverRank: data.rank, isSubmitting: false });
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('scores-synced', { detail: { count: 1 } }));
+        }
       } else {
         await queueOfflineScore({
           id: effSessionId,
           gameType: 'tetris',
           dateSeed: state.dateSeed,
-          nickname: storedNickname,
+          nickname: effNickname,
           movesCount: state.linesCleared,
           score: state.score,
           durationMs: state.elapsedMs,
@@ -494,7 +501,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
         id: effSessionId,
         gameType: 'tetris',
         dateSeed: state.dateSeed,
-        nickname: storedNickname,
+        nickname: effNickname,
         movesCount: state.linesCleared,
         score: state.score,
         durationMs: state.elapsedMs,

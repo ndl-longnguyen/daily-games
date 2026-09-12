@@ -297,6 +297,9 @@ export const useGameStore = create<GameState>((set, get) => ({
           finalDurationMs: data.durationMs,
           isSubmittingScore: false,
         });
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('scores-synced', { detail: { count: 1 } }));
+        }
       } else {
         // Queue offline fallback
         await queueOfflineScore({
