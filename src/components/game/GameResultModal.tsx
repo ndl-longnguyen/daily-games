@@ -7,6 +7,7 @@ import { useGameStore } from '@/store/useGameStore';
 import { useSudokuStore } from '@/store/useSudokuStore';
 import { useTetrisStore } from '@/store/useTetrisStore';
 import { GAMES_LIST } from '@/lib/constants';
+import { getClientId, updatePendingScoresNickname, setStoredSetting } from '@/lib/storage';
 
 export default function GameResultModal() {
   const activeGame = useGameStore((state) => state.activeGame);
@@ -61,6 +62,8 @@ export default function GameResultModal() {
 
   const [copied, setCopied] = useState(false);
   const [customName, setCustomName] = useState<string | null>(null);
+  const [modalNickError, setModalNickError] = useState<string | null>(null);
+  const [isCheckingNick, setIsCheckingNick] = useState(false);
   const inputName = customName !== null ? customName : (activeNickname || 'Player');
 
   // Determine modal active state
@@ -162,10 +165,38 @@ export default function GameResultModal() {
   const handleSaveNickname = async (e: React.FormEvent) => {
     e.preventDefault();
     const clean = inputName.trim().slice(0, 24) || 'Player';
+    setModalNickError(null);
+
+    const clientId = await getClientId();
+
+    if (navigator.onLine && clean.toLowerCase() !== 'player') {
+      setIsCheckingNick(true);
+      try {
+        const res = await fetch('/api/user/check-nickname', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nickname: clean, clientId }),
+        });
+        const data = await res.json();
+        if (!data.available) {
+          setModalNickError(data.error || 'Nickname already taken. Please choose another!');
+          setIsCheckingNick(false);
+          return;
+        }
+      } catch {}
+      setIsCheckingNick(false);
+    }
+
     setEmojiNickname(clean);
     setSudokuNickname(clean);
     setTetrisNickname(clean);
     setCustomName(clean);
+
+    if (!navigator.onLine) {
+      await updatePendingScoresNickname(clean);
+      await setStoredSetting('pending_nickname_sync', clean);
+    }
+
     await handleSubmit();
   };
 
@@ -244,18 +275,18 @@ export default function GameResultModal() {
               />
               <button
                 type="submit"
-                disabled={isSubmitting || !inputName.trim()}
+                disabled={isSubmitting || isCheckingNick || !inputName.trim()}
                 className="px-3.5 py-1.5 rounded-xl bg-slate-200 hover:bg-white text-slate-900 font-bold text-xs transition-colors flex items-center gap-1 shadow-sm touch-manipulation"
               >
                 <UserCheck className="w-3.5 h-3.5" />
-                <span>{isSubmitting ? '...' : 'Save'}</span>
+                <span>{isSubmitting || isCheckingNick ? '...' : 'Save'}</span>
               </button>
             </form>
 
-            {emojiError && (
+            {(modalNickError || emojiError) && (
               <p className="text-[10px] text-rose-400 mt-1.5 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
-                <span>{emojiError}</span>
+                <span>{modalNickError || emojiError}</span>
               </p>
             )}
           </div>

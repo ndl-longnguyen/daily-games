@@ -6,7 +6,7 @@ import { GameType } from '@/lib/constants';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { sessionId, nickname, movesCount, score, dateSeed, durationMs } = body;
+    const { sessionId, nickname, movesCount, score, dateSeed, durationMs, clientId } = body;
     const gameType: GameType = body.gameType || 'emoji';
 
     if (!sessionId || typeof movesCount !== 'number') {
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       score: typeof score === 'number' ? score : 0,
       dateSeed: effectiveDateSeed,
       durationMs: typeof durationMs === 'number' ? durationMs : undefined,
+      clientId: typeof clientId === 'string' ? clientId : undefined,
     });
 
     if (!result.success) {

@@ -11,7 +11,7 @@ import {
 import { TetrominoType } from '@/lib/games/tetris/tetrominoes';
 import { TETRIS_COLS } from '@/lib/constants';
 import { getTodaySeedString } from '@/lib/prng';
-import { queueOfflineScore, getStoredSetting, setStoredSetting } from '@/lib/storage';
+import { queueOfflineScore, getStoredSetting, setStoredSetting, getClientId } from '@/lib/storage';
 import { sound } from '@/lib/audio';
 
 interface TetrisState {
@@ -444,6 +444,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
   submitFinalScore: async () => {
     const state = get();
     const effSessionId = state.sessionId || ('offline-' + crypto.randomUUID());
+    const clientId = await getClientId();
     const effNickname = state.nickname || (await getStoredSetting<string>('player_nickname', 'Player')) || 'Player';
     set({ sessionId: effSessionId, isSubmitting: true });
 
@@ -457,6 +458,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
         score: state.score,
         durationMs: state.elapsedMs,
         completedAt: Date.now(),
+        clientId,
       });
       set({ isSubmitting: false });
       return;
@@ -474,6 +476,7 @@ export const useTetrisStore = create<TetrisState>((set, get) => ({
           score: state.score,
           dateSeed: state.dateSeed,
           durationMs: state.elapsedMs,
+          clientId,
         }),
       });
 

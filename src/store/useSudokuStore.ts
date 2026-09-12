@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { SudokuGrid } from '@/lib/games/sudoku/types';
 import { generateDailySudoku, isSudokuSolved } from '@/lib/games/sudoku/generator';
 import { getTodaySeedString } from '@/lib/prng';
-import { queueOfflineScore, getStoredSetting, setStoredSetting } from '@/lib/storage';
+import { queueOfflineScore, getStoredSetting, setStoredSetting, getClientId } from '@/lib/storage';
 import { sound } from '@/lib/audio';
 import { SUDOKU_MAX_MISTAKES } from '@/lib/constants';
 
@@ -222,6 +222,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
     if (!state.isCompleted) return;
 
     const effSessionId = state.sessionId || ('offline-' + crypto.randomUUID());
+    const clientId = await getClientId();
     const effNickname = state.nickname || (await getStoredSetting<string>('player_nickname', 'Player')) || 'Player';
     set({ sessionId: effSessionId, isSubmitting: true });
 
@@ -235,6 +236,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
         score: 0,
         durationMs: state.elapsedMs,
         completedAt: Date.now(),
+        clientId,
       });
       set({ isSubmitting: false });
       return;
@@ -251,6 +253,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
           movesCount: Math.max(20, state.movesCount),
           dateSeed: state.dateSeed,
           durationMs: state.elapsedMs,
+          clientId,
         }),
       });
 

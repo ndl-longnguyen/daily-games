@@ -3,7 +3,7 @@ import { CardItem, generateBoard } from '@/lib/board-generator';
 import { getTodaySeedString } from '@/lib/prng';
 import { MISMATCH_DELAY_MS, TOTAL_PAIRS, GameType } from '@/lib/constants';
 import { sound } from '@/lib/audio';
-import { saveGameSession, loadGameSession, getStoredSetting, setStoredSetting, queueOfflineScore } from '@/lib/storage';
+import { saveGameSession, loadGameSession, getStoredSetting, setStoredSetting, queueOfflineScore, getClientId } from '@/lib/storage';
 
 interface GameState {
   // Board & Daily Seed
@@ -259,6 +259,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (!state.isCompleted) return;
 
     const effSessionId = state.sessionId || ('offline-' + crypto.randomUUID());
+    const clientId = await getClientId();
     set({ sessionId: effSessionId, isSubmittingScore: true, submitError: null });
 
     if (typeof window !== 'undefined' && !navigator.onLine) {
@@ -271,6 +272,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         score: 0,
         durationMs: state.elapsedMs,
         completedAt: Date.now(),
+        clientId,
       });
       set({ isSubmittingScore: false, submitError: null });
       return;
@@ -287,6 +289,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           movesCount: state.movesCount,
           dateSeed: state.dateSeed,
           durationMs: state.elapsedMs,
+          clientId,
         }),
       });
 

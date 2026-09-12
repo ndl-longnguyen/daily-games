@@ -10,6 +10,7 @@ export interface PendingSyncScore {
   score: number;
   durationMs: number;
   completedAt: number;
+  clientId?: string;
 }
 
 interface DailyGamesDBSchema extends DBSchema {
@@ -130,4 +131,42 @@ export async function clearPendingScores(): Promise<void> {
   const db = await getDB();
   if (!db) return;
   await db.clear('pending_sync');
+}
+
+/**
+ * Get or generate persistent unique Client/Device ID for duplicate check & sync
+ */
+export async function getClientId(): Promise<string> {
+  if (typeof window === 'undefined') return 'server-client-id';
+  try {
+    const fromDB = await getStoredSetting<string | null>('client_id', null);
+    if (fromDB) return fromDB;
+
+    const fromStorage = localStorage.getItem('daily_games_client_id');
+    if (fromStorage) {
+      await setStoredSetting('client_id', fromStorage);
+      return fromStorage;
+    }
+
+    const newId = 'dg_client_' + crypto.randomUUID();
+    localStorage.setItem('daily_games_client_id', newId);
+    await setStoredSetting('client_id', newId);
+    return newId;
+  } catch {
+    return 'fallback-client-id';
+  }
+}
+
+/**
+ * Update the nickname on all queued offline scores when player updates name offline
+ */
+export async function updatePendingScoresNickname(newNickname: string): Promise<void> {
+  const db = await getDB();
+  if (!db) return;
+  const pending = await db.getAll('pending_sync');
+  for (const item of pending) {
+    item.nickname = newNickname;
+    await db.put('pending_sync', item);
+  }
+  console.log('[Storage] Updated nickname on all pending scores to:', newNickname);
 }

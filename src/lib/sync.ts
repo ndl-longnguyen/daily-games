@@ -1,4 +1,4 @@
-import { getPendingScores, removePendingScore } from './storage';
+import { getPendingScores, removePendingScore, getStoredSetting, setStoredSetting, getClientId } from './storage';
 
 let isSyncing = false;
 
@@ -11,6 +11,30 @@ export async function syncPendingScores(): Promise<{ syncedCount: number; errors
   }
 
   isSyncing = true;
+  const clientId = await getClientId();
+
+  // 1. Sync pending offline nickname if player updated name while offline
+  const pendingNickname = await getStoredSetting<string | null>('pending_nickname_sync', null);
+  if (pendingNickname) {
+    try {
+      const res = await fetch('/api/user/sync-nickname', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, nickname: pendingNickname }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await setStoredSetting('pending_nickname_sync', null);
+        console.log(`[Sync] Successfully synced offline nickname "${pendingNickname}" to server.`);
+        window.dispatchEvent(new CustomEvent('scores-synced', { detail: { count: 1 } }));
+      } else {
+        console.warn('[Sync] Offline nickname duplicate/sync warning:', data.error);
+      }
+    } catch (e) {
+      console.warn('[Sync] Could not sync nickname yet:', e);
+    }
+  }
+
   const pending = await getPendingScores();
   let syncedCount = 0;
   const errors: string[] = [];
@@ -35,6 +59,7 @@ export async function syncPendingScores(): Promise<{ syncedCount: number; errors
           score: item.score,
           dateSeed: item.dateSeed,
           durationMs: item.durationMs,
+          clientId: item.clientId || clientId,
         }),
       });
 

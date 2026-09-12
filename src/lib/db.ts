@@ -15,6 +15,7 @@ export interface LeaderboardEntry {
   dateSeed: string;
   gameType: GameType;
   sessionId?: string;
+  clientId?: string;
 }
 
 // Session secret for HMAC stateless verification
@@ -102,6 +103,124 @@ export async function createGameSession(
   return { sessionId, startTime };
 }
 
+
+/**
+ * Check if a nickname is available for a given client (preventing duplicate claims).
+ */
+export async function checkNicknameAvailable(
+  nickname: string,
+  clientId?: string
+): Promise<{ available: boolean; error?: string }> {
+  const clean = (nickname || '').trim().slice(0, 24);
+  if (!clean || clean.length < 2) {
+    return { available: false, error: 'Nickname must be at least 2 characters.' };
+  }
+  if (clean.toLowerCase() === 'player') {
+    return { available: true };
+  }
+
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('client_id, session_id, nickname')
+        .ilike('nickname', clean)
+        .limit(10);
+
+      if (!error && data && data.length > 0) {
+        const isConflict = data.some((row: { client_id?: string }) => {
+          if (row.client_id && clientId) {
+            return row.client_id !== clientId;
+          }
+          return false;
+        });
+
+        if (isConflict) {
+          return {
+            available: false,
+            error: `Nickname "${clean}" is already taken by another player. Please choose another!`,
+          };
+        }
+      }
+      return { available: true };
+    } catch (err) {
+      console.warn('[DB] Nickname check error, allowing:', err);
+      return { available: true };
+    }
+  }
+
+  // Fallback storage check
+  const entries = readFallbackLeaderboard();
+  const conflict = entries.some(
+    (e) =>
+      e.nickname.toLowerCase() === clean.toLowerCase() &&
+      e.clientId &&
+      clientId &&
+      e.clientId !== clientId
+  );
+  if (conflict) {
+    return {
+      available: false,
+      error: `Nickname "${clean}" is already taken. Please choose another!`,
+    };
+  }
+
+  return { available: true };
+}
+
+/**
+ * Synchronize / update player nickname across all their leaderboard records for this client.
+ */
+export async function syncUserNickname(
+  clientId: string,
+  newNickname: string,
+  dateSeed?: string
+): Promise<{ success: boolean; error?: string; updatedCount: number }> {
+  const check = await checkNicknameAvailable(newNickname, clientId);
+  if (!check.available) {
+    return { success: false, error: check.error, updatedCount: 0 };
+  }
+
+  const clean = newNickname.trim().slice(0, 24) || 'Player';
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      let query = supabase
+        .from('leaderboard')
+        .update({ nickname: clean })
+        .eq('client_id', clientId);
+
+      if (dateSeed) {
+        query = query.eq('date_seed', dateSeed);
+      }
+
+      const { data, error } = await query.select();
+      if (error) {
+        console.warn('[DB] Supabase nickname sync warning:', error.message);
+        return { success: false, error: error.message, updatedCount: 0 };
+      }
+      return { success: true, updatedCount: data ? data.length : 1 };
+    } catch (err) {
+      console.error('[DB] Nickname sync error:', err);
+    }
+  }
+
+  // Fallback store
+  const entries = readFallbackLeaderboard();
+  let count = 0;
+  for (const e of entries) {
+    if (e.clientId === clientId && (!dateSeed || e.dateSeed === dateSeed)) {
+      e.nickname = clean;
+      count++;
+    }
+  }
+  if (count > 0) {
+    writeFallbackLeaderboard(entries);
+  }
+  return { success: true, updatedCount: count };
+}
+
 /**
  * Finish a game session, verify integrity and record score to leaderboard.
  * Supports Supabase when configured, and serverless fallback when offline/local.
@@ -114,6 +233,7 @@ export async function finishGameSession(params: {
   score?: number;
   dateSeed: string;
   durationMs?: number;
+  clientId?: string;
 }): Promise<{
   success: boolean;
   durationMs?: number;
@@ -159,7 +279,13 @@ export async function finishGameSession(params: {
       finalDurationMs = params.durationMs || 30000;
     }
 
-    // 2. Anti-Cheat Verification
+    // 2. Anti-Cheat & Duplicate Verification
+    if (cleanNickname.toLowerCase() !== 'player' && params.clientId) {
+      const check = await checkNicknameAvailable(cleanNickname, params.clientId);
+      if (!check.available) {
+        return { success: false, error: check.error };
+      }
+    }
     if (gameType === 'emoji') {
       if (movesCount < TOTAL_PAIRS) {
         return {
@@ -196,6 +322,7 @@ export async function finishGameSession(params: {
             duration_ms: finalDurationMs,
             moves_count: movesCount,
             score: score,
+            client_id: params.clientId || null,
             created_at: now,
           },
           { onConflict: 'session_id' }
@@ -247,6 +374,7 @@ export async function finishGameSession(params: {
       dateSeed: dateSeed,
       gameType: gameType,
       sessionId: sessionId,
+      clientId: params.clientId,
     };
 
     const existingIdx = entries.findIndex(
