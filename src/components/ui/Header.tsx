@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
-import { Volume2, VolumeX, Clock, Trophy, Grid, Wifi, WifiOff } from 'lucide-react';
+import { Volume2, VolumeX, Clock, Trophy, Grid, Wifi, WifiOff, User, Pencil } from 'lucide-react';
 import { useGameStore } from '@/store/useGameStore';
+import { useSudokuStore } from '@/store/useSudokuStore';
+import { useTetrisStore } from '@/store/useTetrisStore';
 import { getRemainingTimeUntilReset } from '@/lib/prng';
 import { GAMES_LIST } from '@/lib/constants';
 
@@ -21,6 +23,17 @@ export default function Header() {
   const setIsOnline = useGameStore((state) => state.setIsOnline);
 
   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+
+  const emojiNickname = useGameStore((state) => state.nickname);
+  const sudokuNickname = useSudokuStore((state) => state.nickname);
+  const tetrisNickname = useTetrisStore((state) => state.nickname);
+
+  const currentNickname =
+    (activeGame === 'tetris'
+      ? tetrisNickname
+      : activeGame === 'sudoku'
+      ? sudokuNickname
+      : emojiNickname) || 'Player';
   const [countdown, setCountdown] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   // Listen to browser online/offline status
@@ -117,8 +130,25 @@ export default function Header() {
             </button>
           </div>
 
-          {/* Right: Daily Countdown & Sound */}
-          <div className="flex items-center gap-1 shrink-0">
+          {/* Right: Player Name & Countdown & Sound */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Player Nickname Chip */}
+            {isMounted && (
+              <button
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-edit-nickname'));
+                }}
+                title={`Playing as: ${currentNickname} • Click to change nickname`}
+                className="hidden sm:flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-700/80 px-2.5 py-1 rounded-xl border border-slate-700/60 text-xs text-slate-200 hover:text-white transition-all touch-manipulation group active:scale-95 cursor-pointer shadow-sm"
+              >
+                <User className="w-3.5 h-3.5 text-indigo-400 group-hover:text-indigo-300 shrink-0" />
+                <span className="font-semibold text-xs max-w-[85px] truncate text-slate-100">
+                  {currentNickname}
+                </span>
+                <Pencil className="w-2.5 h-2.5 text-slate-400 group-hover:text-amber-400 shrink-0 transition-colors" />
+              </button>
+            )}
             {isMounted && (
               <div
                 title="Time remaining until daily puzzles reset"

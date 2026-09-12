@@ -6,6 +6,8 @@ import { getTodaySeedString } from '@/lib/prng';
 import { LeaderboardEntry } from '@/lib/db';
 import { GAMES_LIST, GameType } from '@/lib/constants';
 import { useGameStore } from '@/store/useGameStore';
+import { useSudokuStore } from '@/store/useSudokuStore';
+import { useTetrisStore } from '@/store/useTetrisStore';
 
 export default function LeaderboardSection() {
   const today = getTodaySeedString();
@@ -16,6 +18,17 @@ export default function LeaderboardSection() {
   const [selectedGame, setSelectedGame] = useState<GameType>(activeGame);
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const emojiNickname = useGameStore((state) => state.nickname);
+  const sudokuNickname = useSudokuStore((state) => state.nickname);
+  const tetrisNickname = useTetrisStore((state) => state.nickname);
+
+  const currentNickname =
+    (selectedGame === 'tetris'
+      ? tetrisNickname
+      : selectedGame === 'sudoku'
+      ? sudokuNickname
+      : emojiNickname) || 'Player';
 
   const fetchLeaderboard = useCallback((date: string, game: GameType) => {
     fetch(`/api/leaderboard?date=${date}&gameType=${game}&limit=50`)
@@ -153,6 +166,10 @@ export default function LeaderboardSection() {
             const isTop1 = index === 0;
             const isTop2 = index === 1;
             const isTop3 = index === 2;
+            const isCurrentUser =
+              Boolean(currentNickname) &&
+              currentNickname.toLowerCase() !== 'player' &&
+              entry.nickname.toLowerCase() === currentNickname.toLowerCase();
 
             let rankBadge = (
               <span className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-mono font-bold text-slate-400">
@@ -198,9 +215,14 @@ export default function LeaderboardSection() {
                   {rankBadge}
                   <div className="flex items-center gap-1.5 truncate">
                     <User className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                    <span className="font-semibold text-xs sm:text-sm text-slate-200 truncate">
+                    <span className={`font-semibold text-xs sm:text-sm truncate ${isCurrentUser ? 'text-amber-300 font-bold' : 'text-slate-200'}`}>
                       {entry.nickname}
                     </span>
+                    {isCurrentUser && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/25 text-indigo-300 border border-indigo-500/40 shrink-0">
+                        You
+                      </span>
+                    )}
                   </div>
                 </div>
 

@@ -22,6 +22,7 @@ import TouchControls from '@/components/games/tetris/TouchControls';
 // Unified Result & Leaderboard
 import GameResultModal from '@/components/game/GameResultModal';
 import LeaderboardSection from '@/components/ui/LeaderboardSection';
+import PlayerBanner from '@/components/common/PlayerBanner';
 
 import { Sparkles, Trophy, HelpCircle, ChevronDown, Keyboard, Smartphone, Wifi, Zap, ShieldCheck, Download } from 'lucide-react';
 import { initOfflineSync } from '@/lib/sync';
@@ -73,6 +74,9 @@ export default function HomePage() {
           aria-label="Active Game Arena"
           className="w-full flex flex-col items-center animate-in fade-in duration-200 max-w-xl mx-auto"
         >
+          {/* Active Player Status Bar */}
+          <PlayerBanner />
+
           {/* 1. EMOJI MATCH 8x8 */}
           {activeGame === 'emoji' && (
             <>
