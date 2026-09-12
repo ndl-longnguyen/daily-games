@@ -46,14 +46,14 @@ export const PwaInstallPrompt: React.FC = () => {
   const [manuallyInstalled, setManuallyInstalled] = useState(false);
 
   const deviceType = useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     getDeviceType,
     () => 'desktop' as const
   );
 
   const isStandalone = useSyncExternalStore(
     (callback) => {
-      if (typeof window === 'undefined') return () => {};
+      if (typeof window === 'undefined') return () => { };
       const mql = window.matchMedia('(display-mode: standalone)');
       mql.addEventListener('change', callback);
       return () => mql.removeEventListener('change', callback);
@@ -136,7 +136,7 @@ export const PwaInstallPrompt: React.FC = () => {
     setShowGuide(false);
     try {
       localStorage.setItem(DISMISS_KEY, Date.now().toString());
-    } catch {}
+    } catch { }
   };
 
   if (isStandalone || manuallyInstalled || !showPrompt) return null;
@@ -164,16 +164,9 @@ export const PwaInstallPrompt: React.FC = () => {
               ) : (
                 <Smartphone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               )}
-              <span className="hidden sm:inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
-                <Wifi className="w-2.5 h-2.5" /> Offline Ready
-              </span>
             </div>
             <div className="text-[11px] text-slate-300 truncate mt-0.5">
-              {deviceType === 'ios'
-                ? 'Play 100% offline & fullscreen'
-                : deviceType === 'android'
-                ? '1-tap launch & 100% offline'
-                : 'Windowed app & 100% offline'}
+              Play 100% offline & fullscreen
             </div>
           </div>
         </div>
