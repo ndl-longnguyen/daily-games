@@ -142,11 +142,11 @@ export const PwaInstallPrompt: React.FC = () => {
   if (isStandalone || manuallyInstalled || !showPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-50 glass-panel rounded-3xl p-3.5 sm:p-4 border border-amber-500/40 shadow-2xl flex flex-col gap-2.5 animate-in fade-in slide-in-from-bottom-4 duration-300 bg-slate-950/95 backdrop-blur-xl select-none">
+    <div className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-lg z-50 glass-panel rounded-3xl p-3.5 sm:p-4 border border-amber-500/40 shadow-2xl flex flex-col gap-2.5 animate-in fade-in slide-in-from-bottom-4 duration-300 bg-slate-950/95 backdrop-blur-xl select-none">
       {/* Top Banner Row */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="relative w-11 h-11 rounded-2xl overflow-hidden border border-amber-500/40 shrink-0 bg-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.25)] flex items-center justify-center">
+      <div className="flex items-center justify-between gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-2xl overflow-hidden border border-amber-500/40 shrink-0 bg-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.25)] flex items-center justify-center">
             <Image
               src="/logo-icon.svg"
               alt="Daily Games App"
@@ -156,24 +156,24 @@ export const PwaInstallPrompt: React.FC = () => {
             />
           </div>
 
-          <div className="min-w-0">
-            <div className="text-xs sm:text-sm font-bold text-white truncate flex items-center gap-1.5">
-              <span>Install Daily Games</span>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+              <span className="truncate">Install Daily Games</span>
               {deviceType === 'desktop' ? (
                 <Monitor className="w-3.5 h-3.5 text-sky-400 shrink-0" />
               ) : (
                 <Smartphone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               )}
-              <span className="hidden sm:inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="hidden sm:inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
                 <Wifi className="w-2.5 h-2.5" /> Offline Ready
               </span>
             </div>
             <div className="text-[11px] text-slate-300 truncate mt-0.5">
               {deviceType === 'ios'
-                ? 'Play fullscreen offline with 0ms touch latency'
+                ? 'Play 100% offline & fullscreen'
                 : deviceType === 'android'
-                ? 'Fast 1-tap launcher & 100% offline play on Chrome'
-                : 'Desktop offline app with instant keyboard shortcuts'}
+                ? '1-tap launch & 100% offline'
+                : 'Windowed app & 100% offline'}
             </div>
           </div>
         </div>
@@ -182,14 +182,29 @@ export const PwaInstallPrompt: React.FC = () => {
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={handleInstallClick}
-            className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition-all shadow-md active:scale-95 cursor-pointer touch-manipulation"
+            className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition-all shadow-md active:scale-95 cursor-pointer touch-manipulation whitespace-nowrap"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 shrink-0" />
             <span>
-              {deferredPrompt ? 'Install App' : showGuide ? 'Hide Guide' : 'How to Install'}
+              {deferredPrompt ? (
+                <>
+                  <span className="hidden sm:inline">Install App</span>
+                  <span className="sm:hidden">Install</span>
+                </>
+              ) : showGuide ? (
+                <>
+                  <span className="hidden sm:inline">Hide Guide</span>
+                  <span className="sm:hidden">Hide</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden sm:inline">How to Install</span>
+                  <span className="sm:hidden">Install</span>
+                </>
+              )}
             </span>
             {!deferredPrompt && (
-              showGuide ? <ChevronUp className="w-3 h-3 ml-0.5" /> : <ChevronDown className="w-3 h-3 ml-0.5" />
+              showGuide ? <ChevronUp className="w-3 h-3 ml-0.5 shrink-0" /> : <ChevronDown className="w-3 h-3 ml-0.5 shrink-0" />
             )}
           </button>
           <button
